@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>M3U video lejátszó</title>
+</head>
+<body>
+  <video id="videoPlayer" controls></video>
+  <ul id="playlist"></ul>
+
+  <script>
+    // Az M3U fájl URL-je
+    const m3uUrl = "http://live.huntv.net:8080/playlist/BencusixGC34/GStQT5RqwC/m3u_plus"
+
+    // Az video lejátszó elem
+    const videoPlayer = document.getElementById("videoPlayer");
+
+    // A lista elem, amelybe az M3U fájl tartalmát fogjuk betölteni
+    const playlist = document.getElementById("playlist");
+
+    // Az M3U fájl letöltése
+    const xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+      if (this.readyState === 4 && this.status === 200) {
+        // Az M3U fájl tartalmának feldolgozása
+        const playlistContent = this.responseText;
+
+        // Az M3U fájl tartalmának elemzése és a lista elemek hozzáadása
+        const tracks = playlistContent.split(/\r?\n/).filter(line => line.trim() !== "" && !line.startsWith("#"));
+        tracks.forEach(function(track) {
+          const listItem = document.createElement("li");
+          const link = document.createElement("a");
+          link.setAttribute("href", track);
+          link.textContent = track;
+          listItem.appendChild(link);
+          playlist.appendChild(listItem);
+        });
+
+        // Az első track betöltése és lejátszása
+        videoPlayer.src = tracks[0];
+        videoPlayer.play();
+      }
+    };
+    xhr.open("GET", m3uUrl);
+    xhr.send();
+  </script>
+</body>
+</html>
